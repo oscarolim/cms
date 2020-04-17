@@ -25,7 +25,7 @@
                     </thead>
                     <tbody>
 
-                    {!! JoomForms::table_rows($sitemap, ['name', 'slug'], ['published', 'edit', 'delete'], route('sitemap'), 'children') !!}
+                    {!! JoomForms::table_rows($sitemap, ['name', 'slug'], ['move', 'published', 'edit', 'delete'], route('sitemap'), 'children') !!}
                     </tbody>
                 </table>
             </form>

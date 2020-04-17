@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-12">
             {!! JoomLinks::return_button('sitemap') !!}
 
             @isset($sitemap)
@@ -11,8 +11,25 @@
             @else
                 <h1>New sitemap section</h1>
             @endisset
-
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h3>Add content</h3>
+            <div class="btn-group" role="group" aria-label="Available blocks">
+                <button type="button" class="btn btn-secondary" onclick="add_content_block('text')">Text</button>
+                <button type="button" class="btn btn-secondary" onclick="add_content_block('image')">Image</button>
+                <button type="button" class="btn btn-secondary" onclick="add_content_block('text+image')">Text + Image</button>
+            </div>
+            <hr />
+            <div id="structure">
+                {!! JoomForms:: parse_block_configuration($sitemap->structure, $sitemap->content) !!}
+            </div>
+        </div>
+        <div class="col-md-4">
             <form method="POST" action="{{ route('sitemap') }}/{{$sitemap->id ?? ''}}">
+                <input type="hidden" id="__route" value="{{ route('sitemap') }}/{{$sitemap->id ?? 0}}" />
+                <input type="hidden" id="__block_key" value="{{ $sitemap->structure_block_key ?? 0}}" />
                 @csrf
                 @isset($sitemap)
                     @method('PUT')
@@ -37,9 +54,9 @@
                 <div class="form-group">
                     <label for="parent_id">Parent section</label>
                     <select class="form-control" id="parent_id" name="parent_id" aria-describedby="parent_id">
-                        <option value="NULL">Root</option>
+                        <option value="">Root</option>
                         @foreach($sections as $section_item_id => $section_item)
-                            <option value="{{ $section_item_id }}">{!! $section_item !!}</option>
+                            <option value="{{ $section_item_id }}" {{ JoomForms::option_is_selected('parent_id', $section_item_id, $sitemap->parent_id ?? false) }}>{!! $section_item !!}</option>
                         @endforeach
                     </select>
                     @error('parent_id')

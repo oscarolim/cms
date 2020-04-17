@@ -10882,3 +10882,22 @@ a.text-dark:focus {
   }
 }
 
+.content-block {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.content-block .cb-header {
+  padding: 10px 10px 10px 20px;
+  background-color: #333;
+  margin-bottom: 10px;
+  cursor: move;
+}
+
+.content-block .cb-header .cb-title {
+  line-height: 30px;
+  font-size: 20px;
+  color: #fff;
+}
+

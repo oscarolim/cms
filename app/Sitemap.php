@@ -12,7 +12,7 @@ class Sitemap extends Model
     
     protected $dates = ['deleted_at'];
     protected $table = 'sitemap';
-    protected $fillable = ['name', 'slug', 'published', 'parent_id', 'template_id'];
+    protected $fillable = ['name', 'slug', 'published', 'parent_id', 'template_id', 'structure', 'structure_block_key'];
 
     public function sluggable()
     {
@@ -29,9 +29,14 @@ class Sitemap extends Model
             return array();
         
         if($root == NULL)
-            return self::whereNull('parent_id')->where('id', '!=', $ignore_id)->get();
+            return self::whereNull('parent_id')->where('id', '!=', $ignore_id)->orderBy('position', 'asc')->get();
         else
-            return self::where('parent_id', $root)->where('id', '!=', $ignore_id)->get();
+            return self::where('parent_id', $root)->where('id', '!=', $ignore_id)->orderBy('position', 'asc')->get();
+    }
+
+    public function content()
+    {
+        return $this->hasMany('App\Content');
     }
 
     public function template()
@@ -41,11 +46,11 @@ class Sitemap extends Model
 
     public function children()
     {
-        return $this->hasMany(static::class, 'parent_id')->with('children');
+        return $this->hasMany(static::class, 'parent_id')->with('children')->orderBy('position', 'asc');
     }
 
     public function parent()
     {
-        return $this->belongsTo(static::class, 'parent_id')->whereNull('parent_id')->with('parent');
+        return $this->belongsTo(static::class, 'parent_id')->whereNull('parent_id')->with('parent')->orderBy('position', 'asc');
     }
 }

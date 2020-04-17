@@ -21,6 +21,9 @@ class CreateSitemapTable extends Migration
             $table->foreignId('parent_id')->nullable();
             $table->foreignId('template_id')->nullable()->constrained();
             $table->boolean('published')->default(0);
+            $table->bigInteger('position')->default(0);
+            $table->string('structure', 500)->nullable();
+            $table->integer('structure_block_key')->default(0);
             $table->softDeletes();
 
             $table->foreign('parent_id')->references('id')->on('sitemap');
