@@ -10,9 +10,9 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-    <script src="{{ asset('ckeditor/ckeditor.js') }}" defer></script>
-    <script src="{{ asset('ckeditor/adapters/jquery.js') }}" defer></script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
+    <script src="{{ asset('ckeditor/adapters/jquery.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -37,9 +37,9 @@
                     <ul class="navbar-nav mr-auto">
                         @auth
                         <li class="nav-item"><a class="nav-link {{ Request::is('*dashboard*') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link {{ Request::is('*content*') ? 'active' : '' }}" href="">Content</a></li>
-                        <li class="nav-item"><a class="nav-link {{ Request::is('*sitemap*') ? 'active' : '' }}" href="{{ route('sitemap') }}">Sitemap</a></li>
-                        <li class="nav-item"><a class="nav-link {{ Request::is('*templates*') ? 'active' : '' }}" href="">Templates</a></li>
+                        <!--<li class="nav-item"><a class="nav-link {{ Request::is('*content*') ? 'active' : '' }}" href="">Content</a></li>-->
+                        <li class="nav-item"><a class="nav-link {{ Request::is('*pages*') ? 'active' : '' }}" href="{{ route('sitemap') }}">Pages</a></li>
+                        <!--<li class="nav-item"><a class="nav-link {{ Request::is('*templates*') ? 'active' : '' }}" href="">Templates</a></li>-->
                         @endauth
                     </ul>
 
@@ -88,6 +88,9 @@
         <div style="position: fixed; top: 0; right: 0;" id="toast-container">
 
         </div>
+        @if(session()->has('toast-action'))
+            <script defer>show_toast("{{ session()->get('toast-action') }}");</script>
+        @endisset
     </div>
 </body>
 </html>

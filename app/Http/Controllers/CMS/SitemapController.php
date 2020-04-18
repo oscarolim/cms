@@ -30,11 +30,12 @@ class SitemapController extends Controller
             'name' => 'Untitled']);
         $sitemap->position = Forms::get_next_order('sitemap', $sitemap->parent_id == NULL ? 'parent_id IS NULL' : 'parent_id = '.$sitemap->parent_id);
         $sitemap->save();
-        return $this->edit($sitemap);
+        return $this->edit($sitemap->id);
     }
 
     public function store(Request $request)
     {
+        $request->session()->flash('toast-action', 'item-save');
         $sitemap = Sitemap::create($this->validateSitemap($request));
         $sitemap->position = Forms::get_next_order('sitemap', $sitemap->parent_id == NULL ? 'parent_id IS NULL' : 'parent_id = '.$sitemap->parent_id);
         $sitemap->save();
@@ -59,26 +60,30 @@ class SitemapController extends Controller
 
     public function update(Request $request, Sitemap $sitemap)
     {
+        $request->session()->flash('toast-action', 'item-save');
         $sitemap->update($this->validateSitemap($request));
 
         return redirect(route('sitemap'));
     }
 
-    public function published(Sitemap $sitemap)
+    public function published(Request $request, Sitemap $sitemap)
     {
+        $request->session()->flash('toast-action', 'item-published');
         $sitemap->update(['published' => !$sitemap->published]);
 
         return redirect(route('sitemap'));
     }
 
-    public function move(Sitemap $sitemap, $direction)
+    public function move(Request $request, Sitemap $sitemap, $direction)
     {
+        $request->session()->flash('toast-action', 'item-move');
         Forms::move('sitemap', $direction, $sitemap->id, $sitemap->parent_id == NULL ? 'parent_id IS NULL' : 'parent_id = '.$sitemap->parent_id);
         return redirect(route('sitemap'));
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
+        $request->session()->flash('toast-action', 'item-deleted');
         Sitemap::findOrFail($id)->delete();
         return redirect(route('sitemap'));
     }
@@ -122,26 +127,36 @@ class SitemapController extends Controller
             'block_id' => $request->input('block-id'),
             'block_settings' => $request->input('block-settings')
         ];
+        $new_block = $request->input('new-block');
         switch($request->input('block-type'))
         {
             case 'text':
-                $data['block_tag'] = 'text';
-                $data['block_content'] = $request->input('text');
+                $this->storeBlockField('text', $request->text, $new_block, $data);
             break;
             case 'image':
-
+                $request->validate(['image_id' => 'exists:files,id']);
+                $this->storeBlockField('image', $request->image_id, $new_block, $data);
             break;
             case 'text+image':
-
+                $request->validate(['image_id' => 'exists:files,id']);
+                $this->storeBlockField('image', $request->image_id, $new_block, $data, $request->settings);
+                $this->storeBlockField('text', $request->text, $new_block, $data);
             break;
         }
+    }
 
-        if($request->input('new-block') === 'no')
+    private function storeBlockField($block_tag, $content, $new_block, $data, $settings = '{}')
+    {
+        $data['block_tag'] = $block_tag;
+        $data['block_content'] = $content;
+        $data['block_settings'] = $settings;
+
+        if($new_block === 'no')
         {
             $content = Content::where([
                 'sitemap_id' => $data['sitemap_id'],
                 'block_id' => $data['block_id'],
-                'block_tag' => $data['block_tag']
+                'block_tag' => $block_tag
             ])->firstOrFail();
             $content->update($data);
         }

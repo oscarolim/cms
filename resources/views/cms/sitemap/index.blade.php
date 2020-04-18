@@ -4,8 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <h1>Sitemap</h1>
-
+            <h1>Pages</h1>
             {!! JoomLinks::add_button('sitemap', '/create') !!}
 
             @empty($sitemap)

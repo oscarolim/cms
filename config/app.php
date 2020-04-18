@@ -165,6 +165,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Intervention\Image\ImageServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -231,6 +232,8 @@ return [
 
         'JoomLinks' => App\Helpers\Joom\Links::class,
         'JoomForms' => App\Helpers\Joom\Forms::class,
+
+        'Image' => Intervention\Image\Facades\Image::class
     ],
 
 ];

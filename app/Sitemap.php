@@ -23,6 +23,17 @@ class Sitemap extends Model
         ];
     }
 
+    protected static function booted()
+    {
+        static::deleted(function($sitemap){
+            if ($sitemap->trashed()) 
+            {
+                $sitemap->slug = uniqid('deleted-');
+                $sitemap->save();
+            }
+        });
+    }
+
     public static function sitemap_selector($ignore_id, $root = NULL)
     {
         if($ignore_id === $root)
@@ -36,7 +47,7 @@ class Sitemap extends Model
 
     public function content()
     {
-        return $this->hasMany('App\Content');
+        return $this->hasMany('App\Content')->with('file');
     }
 
     public function template()

@@ -40775,6 +40775,10 @@ $(document).ready(function () {
   $('.toast').toast('show').on('hidden.bs.toast', function () {
     $(this).remove();
   });
+  $('.upload-form-container').each(function () {
+    $(this).html(input_file_upload($(this).data('id')));
+  });
+  init_assync_file_upload();
   $('.table-action-delete').click(function (e) {
     e.preventDefault();
 
@@ -40813,6 +40817,26 @@ window.show_toast = function (title) {
       title: 'Action completed',
       message: 'The selected block has been deleted',
       type: 'success'
+    },
+    'item-save': {
+      title: 'Action completed',
+      message: 'The item data has been saved',
+      type: 'success'
+    },
+    'item-published': {
+      title: 'Action completed',
+      message: 'The item published status has been updated',
+      type: 'success'
+    },
+    'item-move': {
+      title: 'Action completed',
+      message: 'The item order has been updated',
+      type: 'success'
+    },
+    'item-deleted': {
+      title: 'Action completed',
+      message: 'The item has been deleted',
+      type: 'success'
     }
   };
 
@@ -40829,6 +40853,49 @@ window.show_toast = function (title) {
   $('#toast-container').append(html);
   $('.toast').toast('show').on('hidden.bs.toast', function () {
     $(this).remove();
+  });
+};
+
+window.input_file_upload = function (id) {
+  var html = '<form class="form-image-upload form-image-upload-new" data-preview_id="' + id + '" action="javascript:void(0)" enctype="multipart/form-data">';
+  html += '<input type="file" name="image" required="" />';
+  html += '<input type="hidden" name="type" value="image" />';
+  html += '<input type="hidden" name="field_id" value="image" />';
+  html += '<button type="submit" class="btn btn-primary mt-2">Upload image</button>';
+  html += '</form>';
+  return html;
+};
+
+window.init_assync_file_upload = function () {
+  $('.form-image-upload-new').removeClass('form-image-upload-new').on('submit', function (e) {
+    e.preventDefault();
+    upload_image(this);
+  });
+};
+
+window.upload_image = function (form) {
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+  var formData = new FormData(form);
+  $.ajax({
+    type: 'POST',
+    url: $('#__upload_route').val(),
+    data: formData,
+    cache: false,
+    contentType: false,
+    processData: false,
+    success: function success(data) {
+      var target_id = '#' + $(form).data('preview_id');
+      $(target_id + '-image-preview').html('<img src="' + data.folder + data.filename + '" alt="' + data.name + '" />');
+      $(target_id + '-file_id').val(data.id);
+      $(form).trigger("reset");
+    },
+    error: function error(data) {
+      console.log(data);
+    }
   });
 };
 
@@ -40891,25 +40958,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sortablejs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sortablejs */ "./node_modules/sortablejs/modular/sortable.esm.js");
 
 $(document).ready(function () {
-  sortablejs__WEBPACK_IMPORTED_MODULE_0__["default"].create(document.getElementById('structure'), {
-    onSort: function onSort() {
-      save_block_order();
-    }
-  });
+  if ($('#structure').length > 0) {
+    sortablejs__WEBPACK_IMPORTED_MODULE_0__["default"].create(document.getElementById('structure'), {
+      onSort: function onSort() {
+        save_block_order();
+      }
+    });
+  }
 });
 
 window.add_content_block = function (type) {
   var block_id = $('#__block_key').val();
   $('#__block_key').val(parseInt(block_id) + 1);
   block_id = 'block-' + block_id;
+  var html_header_buttons = '<button class="btn btn-primary btn-sm" onclick="content_block_save(\'' + block_id + '\')">Save</button>';
+  html_header_buttons += '<button class="btn btn-danger btn-sm ml-2" onclick="remove_content_block(\'' + block_id + '\')">Delete</button>';
   var html = '';
 
   switch (type) {
     case 'text':
       html = '<div class="content-block" data-block_id="' + block_id + '" data-block_type="text" id="' + block_id + '-container">';
-      html += '<div class="cb-header"><span class="cb-title">Text</span><div class="float-right text-align-right">';
-      html += '<button class="btn btn-primary btn-sm" onclick="content_block_save(\'' + block_id + '\')">Save</button>';
-      html += '<button class="btn btn-danger btn-sm ml-2" onclick="remove_content_block(\'' + block_id + '\')">Delete</button></div></div>';
+      html += '<div class="cb-header"><span class="cb-title">Text</span><div class="float-right text-align-right">' + html_header_buttons + '</div></div>';
       html += '<input type="hidden" id="' + block_id + '-type" value="text" />';
       html += '<input type="hidden" id="' + block_id + '-new" value="yes" />';
       html += '<textarea class="form-control ckeditor newckeditor" rows="5" name="' + block_id + '-text" id="' + block_id + '-text"></textarea>';
@@ -40917,15 +40986,39 @@ window.add_content_block = function (type) {
       break;
 
     case 'image':
+      html = '<div class="content-block" data-block_id="' + block_id + '" data-block_type="image" id="' + block_id + '-container">';
+      html += '<div class="cb-header"><span class="cb-title">Image</span><div class="float-right text-align-right">' + html_header_buttons + '</div></div>';
+      html += '<input type="hidden" id="' + block_id + '-type" value="image" />';
+      html += '<input type="hidden" id="' + block_id + '-new" value="yes" />';
+      html += '<div class="image-preview" id="' + block_id + '-image-preview"></div>';
+      html += '<input type="hidden" id="' + block_id + '-file_id" value="0" />';
+      html += input_file_upload(block_id);
+      html += '</div>';
       break;
 
     case 'text+image':
+      html = '<div class="content-block" data-block_id="' + block_id + '" data-block_type="text+image" id="' + block_id + '-container">';
+      html += '<div class="cb-header"><span class="cb-title">Text + Image</span><div class="float-right text-align-right">' + html_header_buttons + '</div></div>';
+      html += '<input type="hidden" id="' + block_id + '-type" value="text+image" />';
+      html += '<input type="hidden" id="' + block_id + '-new" value="yes" />';
+      html += '<div class="form-group"><label for="' + block_id + '-image-position">Image position</label>';
+      html += '<select id="' + block_id + '-image-position" class="form-control">';
+      html += '<option value="left">Left</value>';
+      html += '<option value="right">Right</value>';
+      html += '<option value="full">Full width (text over image, centred)</value>';
+      html += '</select></div>';
+      html += '<div class="form-group"><textarea class="form-control ckeditor newckeditor" rows="5" name="' + block_id + '-text" id="' + block_id + '-text"></textarea></div>';
+      html += '<div class="image-preview" id="' + block_id + '-image-preview"></div>';
+      html += '<input type="hidden" id="' + block_id + '-file_id" value="0" />';
+      html += input_file_upload(block_id);
+      html += '</div>';
       break;
   }
 
   $('#structure').append(html);
   save_block_order();
   $('textarea.newckeditor').removeClass('newckeditor').ckeditor();
+  init_assync_file_upload();
   show_toast('new-block');
 };
 
@@ -40984,9 +41077,15 @@ window.content_block_save = function (block_id) {
       break;
 
     case 'image':
+      formData.append('image_id', $('#' + block_id + '-file_id').val());
       break;
 
     case 'text+image':
+      formData.append('text', CKEDITOR.instances[block_id + '-text'].getData());
+      formData.append('image_id', $('#' + block_id + '-file_id').val());
+      formData.append('settings', JSON.stringify({
+        position: $('#' + block_id + '-image-position').val()
+      }));
       break;
   }
 
@@ -40999,7 +41098,7 @@ window.content_block_save = function (block_id) {
     processData: false,
     success: function success(data) {
       $('#' + block_id + '-new').val('no');
-      show_toast('delete-block');
+      show_toast('save-block');
     },
     error: function error(data) {
       console.log(data);

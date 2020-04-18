@@ -19,17 +19,19 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::post('/files', 'FileController@store')->name('upload-file');
+
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/cms/dashboard', 'CMS\DashboardController@index')->middleware('auth')->name('dashboard');
 
-Route::get('/cms/sitemap', 'CMS\SitemapController@index')->name('sitemap');
-Route::post('/cms/sitemap', 'CMS\SitemapController@store');
-Route::get('/cms/sitemap/create', 'CMS\SitemapController@create');
-Route::get('/cms/sitemap/{sitemap}/edit', 'CMS\SitemapController@edit');
-Route::put('/cms/sitemap/{sitemap}', 'CMS\SitemapController@update');
-Route::put('/cms/sitemap/{sitemap}/published', 'CMS\SitemapController@published');
-Route::put('/cms/sitemap/{sitemap}/move/{direction}', 'CMS\SitemapController@move');
-Route::delete('/cms/sitemap/{sitemap}', 'CMS\SitemapController@destroy');
-Route::post('/cms/sitemap/{sitemap}/block', 'CMS\SitemapController@updateBlock');
-Route::post('/cms/sitemap/{sitemap}/structure', 'CMS\SitemapController@updateStructure');
+Route::get('/cms/pages', 'CMS\SitemapController@index')->name('sitemap');
+Route::get('/cms/pages/create', 'CMS\SitemapController@create');
+Route::post('/cms/pages', 'CMS\SitemapController@store');
+Route::get('/cms/pages/{sitemap}/edit', 'CMS\SitemapController@edit');
+Route::put('/cms/pages/{sitemap}', 'CMS\SitemapController@update');
+Route::delete('/cms/pages/{sitemap}', 'CMS\SitemapController@destroy');
+Route::put('/cms/pages/{sitemap}/published', 'CMS\SitemapController@published');
+Route::put('/cms/pages/{sitemap}/move/{direction}', 'CMS\SitemapController@move');
+Route::post('/cms/pages/{sitemap}/block', 'CMS\SitemapController@updateBlock');
+Route::post('/cms/pages/{sitemap}/structure', 'CMS\SitemapController@updateStructure');

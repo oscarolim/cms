@@ -16,4 +16,9 @@ class Content extends Model
     {
         return $this->hasOne('App\Sitemap');
     }
+
+    public function file()
+    {
+        return $this->hasOne('App\File', 'id', 'block_content');
+    }
 }

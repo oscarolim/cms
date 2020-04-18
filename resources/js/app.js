@@ -6,6 +6,11 @@ $(document).ready(function(){
         $(this).remove();
     });
 
+    $('.upload-form-container').each(function(){
+        $(this).html(input_file_upload($(this).data('id')));
+    });
+    init_assync_file_upload();
+
     $('.table-action-delete').click(function(e)
     {
         e.preventDefault();
@@ -35,7 +40,11 @@ window.show_toast = function(title, message = '', type = ''){
     let messages = {
         'new-block': {title: 'Action completed', message: 'A new block has been added', type: 'success'},
         'save-block': {title: 'Action completed', message: 'The content for the current block has been saved', type: 'success'},
-        'delete-block': {title: 'Action completed', message: 'The selected block has been deleted', type: 'success'}
+        'delete-block': {title: 'Action completed', message: 'The selected block has been deleted', type: 'success'},
+        'item-save': {title: 'Action completed', message: 'The item data has been saved', type: 'success'},
+        'item-published': {title: 'Action completed', message: 'The item published status has been updated', type: 'success'},
+        'item-move': {title: 'Action completed', message: 'The item order has been updated', type: 'success'},
+        'item-deleted': {title: 'Action completed', message: 'The item has been deleted', type: 'success'},
     };
 
     if(messages[title] != undefined)
@@ -53,5 +62,50 @@ window.show_toast = function(title, message = '', type = ''){
     $('#toast-container').append(html);
     $('.toast').toast('show').on('hidden.bs.toast', function (){
         $(this).remove();
+    });
+}
+
+window.input_file_upload = function(id){
+    let html = '<form class="form-image-upload form-image-upload-new" data-preview_id="' + id + '" action="javascript:void(0)" enctype="multipart/form-data">';
+    html += '<input type="file" name="image" required="" />';
+    html += '<input type="hidden" name="type" value="image" />';
+    html += '<input type="hidden" name="field_id" value="image" />';
+    html += '<button type="submit" class="btn btn-primary mt-2">Upload image</button>';
+    html += '</form>';
+
+    return html;
+}
+
+window.init_assync_file_upload = function(){
+    $('.form-image-upload-new').removeClass('form-image-upload-new').on('submit', (function(e){
+        e.preventDefault();
+        upload_image(this);
+    }));
+}
+
+window.upload_image = function(form){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    var formData = new FormData(form);
+    $.ajax({
+        type:'POST',
+        url: $('#__upload_route').val(),
+        data:formData,
+        cache:false,
+        contentType: false,
+        processData: false,
+        success:function(data){
+            let target_id = '#' + $(form).data('preview_id');
+            $(target_id + '-image-preview').html('<img src="' + data.folder + data.filename + '" alt="' + data.name + '" />');
+            $(target_id + '-file_id').val(data.id);
+            $(form).trigger("reset");
+        },
+        error: function(data){
+            console.log(data);
+        }
     });
 }
