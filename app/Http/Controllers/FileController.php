@@ -34,7 +34,7 @@ class FileController extends Controller
             $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $new_name = time().'_'.Str::slug($name).'.'.$file->extension();
             $ImageUpload = Image::make($file);
-            $ImageUpload->resize(1024, null, function ($constraint){
+            $ImageUpload->resize(2048, null, function ($constraint){
                 $constraint->aspectRatio();
                 $constraint->upsize();
             });

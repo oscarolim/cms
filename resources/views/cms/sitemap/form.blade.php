@@ -20,6 +20,7 @@
                 <button type="button" class="btn btn-secondary" onclick="add_content_block('text')">Text</button>
                 <button type="button" class="btn btn-secondary" onclick="add_content_block('image')">Image</button>
                 <button type="button" class="btn btn-secondary" onclick="add_content_block('text+image')">Text + Image</button>
+                <button type="button" class="btn btn-secondary" onclick="add_content_block('text+video')">Text + Video</button>
             </div>
             <hr />
             <div id="structure">

@@ -131,15 +131,19 @@ class SitemapController extends Controller
         switch($request->input('block-type'))
         {
             case 'text':
-                $this->storeBlockField('text', $request->text, $new_block, $data);
+                $this->storeBlockField('text', $request->text, $new_block, $data, $request->settings);
             break;
             case 'image':
                 $request->validate(['image_id' => 'exists:files,id']);
-                $this->storeBlockField('image', $request->image_id, $new_block, $data);
+                $this->storeBlockField('image', $request->image_id, $new_block, $data, $request->settings);
             break;
             case 'text+image':
                 $request->validate(['image_id' => 'exists:files,id']);
                 $this->storeBlockField('image', $request->image_id, $new_block, $data, $request->settings);
+                $this->storeBlockField('text', $request->text, $new_block, $data);
+            break;
+            case 'text+video':
+                $this->storeBlockField('video', $request->video_url, $new_block, $data, $request->settings);
                 $this->storeBlockField('text', $request->text, $new_block, $data);
             break;
         }
@@ -148,7 +152,7 @@ class SitemapController extends Controller
     private function storeBlockField($block_tag, $content, $new_block, $data, $settings = '{}')
     {
         $data['block_tag'] = $block_tag;
-        $data['block_content'] = $content;
+        $data['block_content'] = $content ?? '';
         $data['block_settings'] = $settings;
 
         if($new_block === 'no')

@@ -45,6 +45,14 @@ class Sitemap extends Model
             return self::where('parent_id', $root)->where('id', '!=', $ignore_id)->orderBy('position', 'asc')->get();
     }
 
+    public static function frontend_navigation($root = NULL)
+    {
+        if($root == NULL)
+            return self::whereNull('parent_id')->where('published', 1)->orderBy('position', 'asc')->with('published_children')->get();
+        else
+            return self::where('parent_id', $root)->where('published', 1)->orderBy('position', 'asc')->with('published_children')->get();
+    }
+
     public function content()
     {
         return $this->hasMany('App\Content')->with('file');
@@ -55,6 +63,11 @@ class Sitemap extends Model
         return $this->hasOne('App\Templates');
     }
 
+    public function published_children()
+    {
+        return $this->hasMany(static::class, 'parent_id')->where('published', 1)->with('published_children')->orderBy('position', 'asc');
+    }
+
     public function children()
     {
         return $this->hasMany(static::class, 'parent_id')->with('children')->orderBy('position', 'asc');
@@ -62,6 +75,11 @@ class Sitemap extends Model
 
     public function parent()
     {
-        return $this->belongsTo(static::class, 'parent_id')->whereNull('parent_id')->with('parent')->orderBy('position', 'asc');
+        return $this->belongsTo(static::class, 'parent_id')->with('parent');
+    }
+
+    public function published_parent()
+    {
+        return $this->belongsTo(static::class, 'parent_id')->where('published', 1)->with('published_parent');
     }
 }
