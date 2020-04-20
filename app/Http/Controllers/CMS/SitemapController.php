@@ -155,6 +155,7 @@ class SitemapController extends Controller
                     'block_image_content' => NULL,
                     'image' => NULL
                 ])->render();
+            break;
             case 'text+image':
                 echo view('cms.sitemap.blocks.text-image', [
                     'block_id' => $request->block_id,
@@ -163,13 +164,14 @@ class SitemapController extends Controller
                     'image' => NULL,
                     'settings' => NULL
                 ])->render();
-                case 'text+video':
-                    echo view('cms.sitemap.blocks.text-video', [
-                        'block_id' => $request->block_id,
-                        'block_text_content' => NULL,
-                        'block_video_content' => NULL,
-                        'settings' => NULL
-                    ])->render();
+            break;
+            case 'text+video':
+                echo view('cms.sitemap.blocks.text-video', [
+                    'block_id' => $request->block_id,
+                    'block_text_content' => NULL,
+                    'block_video_content' => NULL,
+                    'settings' => NULL
+                ])->render();
             break;
         }
     }
