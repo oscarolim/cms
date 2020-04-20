@@ -120,6 +120,42 @@ class SitemapController extends Controller
         ]);
     }
 
+    public function createBlock(Request $request, Sitemap $sitemap)
+    {
+        switch($request->type)
+        {
+            case 'text':
+                echo view('cms.sitemap.blocks.text', [
+                    'block_id' => $request->block_id,
+                    'block_text_content' => NULL,
+                    'settings' => NULL
+                ])->render();
+            break;
+            case 'image':
+                echo view('cms.sitemap.blocks.image', [
+                    'block_id' => $request->block_id,
+                    'block_image_content' => NULL,
+                    'image' => NULL
+                ])->render();
+            case 'text+image':
+                echo view('cms.sitemap.blocks.text-image', [
+                    'block_id' => $request->block_id,
+                    'block_text_content' => NULL,
+                    'block_image_content' => NULL,
+                    'image' => NULL,
+                    'settings' => NULL
+                ])->render();
+                case 'text+video':
+                    echo view('cms.sitemap.blocks.text-video', [
+                        'block_id' => $request->block_id,
+                        'block_text_content' => NULL,
+                        'block_video_content' => NULL,
+                        'settings' => NULL
+                    ])->render();
+            break;
+        }
+    }
+
     public function updateBlock(Request $request, Sitemap $sitemap)
     {
         $data = [
@@ -134,11 +170,13 @@ class SitemapController extends Controller
                 $this->storeBlockField('text', $request->text, $new_block, $data, $request->settings);
             break;
             case 'image':
-                $request->validate(['image_id' => 'exists:files,id']);
+                if($request->image_id > 0)
+                    $request->validate(['image_id' => 'exists:files,id']);
                 $this->storeBlockField('image', $request->image_id, $new_block, $data, $request->settings);
             break;
             case 'text+image':
-                $request->validate(['image_id' => 'exists:files,id']);
+                if($request->image_id > 0)
+                    $request->validate(['image_id' => 'exists:files,id']);
                 $this->storeBlockField('image', $request->image_id, $new_block, $data, $request->settings);
                 $this->storeBlockField('text', $request->text, $new_block, $data);
             break;

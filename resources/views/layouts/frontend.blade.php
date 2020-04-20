@@ -21,7 +21,7 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-light bg-info navbar-expand-md shadow-sm">
+        <nav class="navbar navbar-dark bg-dark navbar-expand-md shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
@@ -44,7 +44,7 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
-                        <a class="btn btn-warning" target="_blank" href="mailto:me@oscarolim.com?subject=Contact">Email me!</a>
+                        <a class="btn btn-success" href="/contact">Contact me!</a>
                     </ul>
                 </div>
             </div>

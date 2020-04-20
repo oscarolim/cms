@@ -10914,3 +10914,11 @@ a.text-dark:focus {
   background-repeat: no-repeat;
 }
 
+.full-75pc-width-image-container {
+  height: 75vh;
+  min-height: 500px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+

@@ -118,77 +118,49 @@ class Forms
         $html = '';
         foreach(json_decode($structure, true) as $block)
         {
-            $html_header_buttons = '<button class="btn btn-primary btn-sm" onclick="content_block_save(\''.$block['id'].'\')">Save</button>';
-            $html_header_buttons .= '<button class="btn btn-danger btn-sm ml-2" onclick="remove_content_block(\''.$block['id'].'\')">Delete</button>';
-
             switch($block['type'])
             {
                 case 'text':
                     $block_text_content = $content->where('block_id', $block['id'])->first();
                     $settings = $block_text_content != NULL ? json_decode($block_text_content->block_settings, TRUE) : ['border' => 'none'];
-                    $html .= '<div class="content-block" data-block_id="'.$block['id'].'" data-block_type="text" id="'.$block['id'].'-container">';
-                    $html .= '<div class="cb-header"><span class="cb-title">Text</span><div class="float-right text-align-right">'.$html_header_buttons.'</div></div>';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-type" value="text" />';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-new" value="'.($block_text_content == NULL ? 'yes' : 'no').'" />';
-                    $html .= '<div class="form-group"><label for="'.$block['id'].'-border">Border</label>';
-                    $html .= '<select id="'.$block['id'].'-border" class="form-control">';
-                    $html .= '<option value="none" '.($settings['border'] ?? '' == 'none' ? 'selected' : '').'>None</value>';
-                    $html .= '<option value="top" '.($settings['border'] ?? '' == 'top' ? 'selected' : '').'>Top</value>';
-                    $html .= '</select></div>';
-                    $html .= '<textarea class="form-control ckeditor" rows="5" name="' .$block['id'] .'-text" id="'.$block['id'].'-text">'.($block_text_content->block_content ?? '').'</textarea>';
-                    $html .= '</div>';
+                    $html .= view('cms.sitemap.blocks.text', [
+                        'block_id' => $block['id'],
+                        'block_text_content' => $block_text_content,
+                        'settings' => $settings
+                    ])->render();
                 break;
                 case 'image':
                     $block_image_content = $content->where('block_id', $block['id'])->first();
                     $image = $block_image_content != NULL && $block_image_content->file != NULL ? $block_image_content->file->where('id', $block_image_content->block_content)->first() : NULL;
-                    $html .= '<div class="content-block" data-block_id="'.$block['id'].'" data-block_type="image" id="'.$block['id'].'-container">';
-                    $html .= '<div class="cb-header"><span class="cb-title">Image</span><div class="float-right text-align-right">'.$html_header_buttons.'</div></div>';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-type" value="image" />';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-new" value="'.($block_image_content == NULL ? 'yes' : 'no').'" />';
-                    $html .= '<div class="image-preview" id="'.$block['id'].'-image-preview">'.($image != NULL ? '<img src="'.asset($image->folder.$image->filename).'" alt="'.$image->name.'">' : '').'</div>';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-file_id" value="'.($image != NULL ? $image->id : 0).'" />';
-                    $html .= '<div class="upload-form-container" data-id="'.$block['id'].'"></div>';
-                    $html .= '</div>';
+                    $html .= view('cms.sitemap.blocks.image', [
+                        'block_id' => $block['id'],
+                        'block_image_content' => $block_image_content,
+                        'image' => $image
+                    ])->render();
                 break;
                 case 'text+image':
                     $block_text_content = $content->where('block_id', $block['id'])->where('block_tag', 'text')->first();
                     $block_image_content = $content->where('block_id', $block['id'])->where('block_tag', 'image')->first();
                     $settings = $block_image_content != NULL ? json_decode($block_image_content->block_settings, TRUE) : ['position' => 'left'];
                     $image = $block_image_content != NULL && $block_image_content->file != NULL ? $block_image_content->file->where('id', $block_image_content->block_content)->first() : NULL;
-                    $html .= '<div class="content-block" data-block_id="'.$block['id'].'" data-block_type="text+image" id="'.$block['id'].'-container">';
-                    $html .= '<div class="cb-header"><span class="cb-title">Text + Image</span><div class="float-right text-align-right">'.$html_header_buttons.'</div></div>';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-type" value="text+image" />';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-new" value="'.($block_text_content == NULL && $block_image_content == NULL ? 'yes' : 'no').'" />';
-                    $html .= '<div class="form-group"><label for="'.$block['id'].'-image-position">Image position</label>';
-                    $html .= '<select id="'.$block['id'].'-image-position" class="form-control">';
-                    $html .= '<option value="left" '.($settings['position'] == 'left' ? 'selected' : '').'>Left</value>';
-                    $html .= '<option value="right" '.($settings['position'] == 'right' ? 'selected' : '').'>Right</value>';
-                    $html .= '<option value="full" '.($settings['position'] == 'full' ? 'selected' : '').'>Full width (text over image, centred)</value>';
-                    $html .= '</select></div>';
-                    $html .= '<div class="form-group"><textarea class="form-control ckeditor" rows="5" name="' .$block['id'] .'-text" id="'.$block['id'].'-text">'.($block_text_content->block_content ?? '').'</textarea></div>';
-                    $html .= '<div class="image-preview" id="'.$block['id'].'-image-preview">'.($image != NULL ? '<img src="'.asset($image->folder.$image->filename).'" alt="'.$image->name.'">' : '').'</div>';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-file_id" value="'.($image != NULL ? $image->id : 0).'" />';
-                    $html .= '<div class="upload-form-container" data-id="'.$block['id'].'"></div>';
-                    $html .= '</div>';
+                    $html .= view('cms.sitemap.blocks.text-image', [
+                        'block_id' => $block['id'],
+                        'block_text_content' => $block_text_content,
+                        'block_image_content' => $block_image_content,
+                        'image' => $image,
+                        'settings' => $settings
+                    ])->render();
                 break;
                 case 'text+video':
                     $block_text_content = $content->where('block_id', $block['id'])->where('block_tag', 'text')->first();
                     $block_video_content = $content->where('block_id', $block['id'])->where('block_tag', 'video')->first();
                     $settings = $block_video_content != NULL ? json_decode($block_video_content->block_settings, TRUE) : ['position' => 'left'];
-                    $html .= '<div class="content-block" data-block_id="'.$block['id'].'" data-block_type="text+video" id="'.$block['id'].'-container">';
-                    $html .= '<div class="cb-header"><span class="cb-title">Text + Video</span><div class="float-right text-align-right">'.$html_header_buttons.'</div></div>';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-type" value="text+video" />';
-                    $html .= '<input type="hidden" id="'.$block['id'].'-new" value="'.($block_text_content == NULL && $block_video_content == NULL ? 'yes' : 'no').'" />';
-                    $html .= '<div class="form-group"><label for="'.$block['id'].'-video-position">Video position</label>';
-                    $html .= '<select id="'.$block['id'].'-video-position" class="form-control">';
-                    $html .= '<option value="left" '.($settings['position'] == 'left' ? 'selected' : '').'>Left</value>';
-                    $html .= '<option value="right" '.($settings['position'] == 'right' ? 'selected' : '').'>Right</value>';
-                    $html .= '<option value="top" '.($settings['position'] == 'top' ? 'selected' : '').'>Top</value>';
-                    $html .= '<option value="bottom" '.($settings['position'] == 'bottom' ? 'selected' : '').'>Bottom</value>';
-                    $html .= '</select></div>';
-                    $html .= '<div class="form-group"><label for="'.$block['id'].'-text">Text</label><textarea class="form-control ckeditor" rows="5" name="' .$block['id'] .'-text" id="'.$block['id'].'-text">'.($block_text_content->block_content ?? '').'</textarea></div>';
-                    $html .= '<div class="form-group"><label for="'.$block['id'].'-video_url">Video embed link</label><input type="text" class="form-control" name="' .$block['id'] .'-video_url" id="'.$block['id'] .'-video_url" value="'.($block_video_content->block_content ?? '').'" /></div>';
-                    $html .= '</div>';
+                    $html .= view('cms.sitemap.blocks.text-video', [
+                        'block_id' => $block['id'],
+                        'block_text_content' => $block_text_content,
+                        'block_video_content' => $block_video_content,
+                        'settings' => $settings
+                    ])->render();
                 break;
             }
         }
