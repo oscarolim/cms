@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Auth::routes(['register' => false]);
+//Auth::routes(['register' => false]);
+Auth::routes();
 
 Route::post('/files', 'FileController@store')->name('upload-file');
 
@@ -31,6 +32,9 @@ Route::put('/cms/pages/{sitemap}/move/{direction}', 'CMS\SitemapController@move'
 Route::get('/cms/pages/{sitemap}/block', 'CMS\SitemapController@createBlock');
 Route::post('/cms/pages/{sitemap}/block', 'CMS\SitemapController@updateBlock');
 Route::post('/cms/pages/{sitemap}/structure', 'CMS\SitemapController@updateStructure');
+
+Route::get('/contact', 'ContactController@show')->name('contact');
+Route::post('/contact', 'ContactController@send');
 
 Route::get('/', 'HomeController@index')->name('home');
 Route::get("{path}", "HomeController@index")->where('path', '.+');

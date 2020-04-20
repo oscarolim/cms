@@ -44,7 +44,7 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
-                        <a class="btn btn-success" href="/contact">Contact me!</a>
+                        <a class="btn btn-success" href="{{ route('contact') }}">Contact me!</a>
                     </ul>
                 </div>
             </div>

@@ -30,7 +30,7 @@ class SitemapController extends Controller
             'name' => 'Untitled']);
         $sitemap->position = Forms::get_next_order('sitemap', $sitemap->parent_id == NULL ? 'parent_id IS NULL' : 'parent_id = '.$sitemap->parent_id);
         $sitemap->save();
-        return $this->edit($sitemap->id);
+        return redirect(route('sitemap').'/'.$sitemap->id.'/edit');
     }
 
     public function store(Request $request)
@@ -60,6 +60,9 @@ class SitemapController extends Controller
 
     public function update(Request $request, Sitemap $sitemap)
     {
+        if(Auth()->id() != 1 && $sitemap->published)
+            return $this->edit($sitemap->id);
+        
         $request->session()->flash('toast-action', 'item-save');
         $sitemap->update($this->validateSitemap($request));
 
@@ -68,6 +71,9 @@ class SitemapController extends Controller
 
     public function published(Request $request, Sitemap $sitemap)
     {
+        if(Auth()->id() != 1)
+            return redirect(route('sitemap'));
+
         $request->session()->flash('toast-action', 'item-published');
         $sitemap->update(['published' => !$sitemap->published]);
 
@@ -76,21 +82,27 @@ class SitemapController extends Controller
 
     public function move(Request $request, Sitemap $sitemap, $direction)
     {
+        if(Auth()->id() != 1)
+            return redirect(route('sitemap'));
+        
         $request->session()->flash('toast-action', 'item-move');
         Forms::move('sitemap', $direction, $sitemap->id, $sitemap->parent_id == NULL ? 'parent_id IS NULL' : 'parent_id = '.$sitemap->parent_id);
         return redirect(route('sitemap'));
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request,   Sitemap $sitemap)
     {
+        if(Auth()->id() != 1 && $sitemap->published)
+            return redirect(route('sitemap'));
+
         $request->session()->flash('toast-action', 'item-deleted');
-        Sitemap::findOrFail($id)->delete();
+        $sitemap->delete();
         return redirect(route('sitemap'));
     }
 
     protected function validateSitemap($request)
     {
-        return $request->validate([
+        $values = $request->validate([
             'slug' => [
                 'max:255',
                 $request->sitemap ? Rule::unique('sitemap')->ignore($request->sitemap->id) : ''
@@ -99,6 +111,10 @@ class SitemapController extends Controller
             'parent_id' => 'nullable',
             'published' => 'boolean'
         ]);
+        
+        if(Auth()->id() != 1)
+            $values['published'] = 0;
+        return $values;
     }
 
     private function sitemap_selector($ignore_id, $root = NULL, $depth = 0)
@@ -114,6 +130,8 @@ class SitemapController extends Controller
 
     public function updateStructure(Request $request, Sitemap $sitemap)
     {
+        if(Auth()->id() != 1 && $sitemap->published)
+            return;
         $sitemap->update([
             'structure' => $request->input('structure'),
             'structure_block_key' => $request->input('block_key')
@@ -158,6 +176,9 @@ class SitemapController extends Controller
 
     public function updateBlock(Request $request, Sitemap $sitemap)
     {
+        if(Auth()->id() != 1 && $sitemap->published)
+            return;
+        
         $data = [
             'sitemap_id' => $sitemap->id,
             'block_id' => $request->input('block-id'),
