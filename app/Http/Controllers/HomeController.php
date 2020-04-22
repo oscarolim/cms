@@ -58,7 +58,7 @@ class HomeController extends Controller
                     if($block_text_content != NULL && $block_text_content->block_content != NULL)
                         $html .= '<div class="container mt-5">
                                     <div class="row justify-content-center">
-                                        <div class="col-8'.(($settings['border'] ?? '') == 'top' ? ' border-top pt-5' : '').'">
+                                        <div class="col-sm-8'.(($settings['border'] ?? '') == 'top' ? ' border-top pt-5' : '').'">
                                             '.$block_text_content->block_content .'
                                         </div>
                                     </div>
@@ -70,7 +70,7 @@ class HomeController extends Controller
                     if($image != NULL)
                         $html .= '<div class="container mt-5">
                                     <div class="row justify-content-center">
-                                        <div class="col-8">
+                                        <div class="col-sm-8">
                                             <img class="w-100" src="'.asset($image->folder.$image->filename).'" alt="'.$image->name.'">
                                         </div>
                                     </div>
@@ -106,7 +106,7 @@ class HomeController extends Controller
                             $html .= '<div class="'.$settings['position'].'-width-image-container" '.($image != NULL ? 'style="background-image:url('.asset($image->folder.$image->filename).')"' : '').'>
                                         <div class="container h-100 position-relative">
                                         <div class="row h-100 justify-content-center align-items-center">
-                                            <div class="col-6 text-center px-5 py-5" style="background-color: rgba(255, 255, 255, 0.7)">
+                                            <div class="col-md-6 text-center px-5 py-5" style="background-color: rgba(255, 255, 255, 0.7)">
                                                 '.($text).'
                                             </div>
                                         </div>
