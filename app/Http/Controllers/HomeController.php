@@ -82,7 +82,7 @@ class HomeController extends Controller
                     $block_image_content = $content->where('block_id', $block['id'])->where('block_tag', 'image')->first();
                     $settings = $block_image_content != NULL ? json_decode($block_image_content->block_settings, TRUE) : ['position' => 'left'];
                     $image = $block_image_content != NULL && $block_image_content->file != NULL ? $block_image_content->file->where('id', $block_image_content->block_content)->first() : NULL;
-                    $image_element = $image != NULL ? '<img class="w-100 '.($settings['position'] !== 'full' ? 'mb-3' : '').'" src="'.asset($image->folder.$image->filename).'" alt="'.$image->name.'">' : '';
+                    $image_element = $image != NULL ? '<div class="image-container"><img class="w-100 '.($settings['position'] !== 'full' ? 'mb-3' : '').'" src="'.asset($image->folder.$image->filename).'" alt="'.$image->name.'" /></div>' : '';
                     if($block_text_content == NULL && $image == NULL)
                         break;
 
@@ -90,7 +90,7 @@ class HomeController extends Controller
                     {
                         case 'left':
                         case 'right':
-                            $html .= '<div class="container mt-5">
+                            $html .= '<div class="container mt-5 text-image-'.$settings['position'].'-container">
                                         <div class="row justify-content-center">
                                             <div class="col-sm-8 col-lg-4">
                                                 '.($settings['position'] == 'left' ? $image_element : $text).'
@@ -106,7 +106,7 @@ class HomeController extends Controller
                             $html .= '<div class="'.$settings['position'].'-width-image-container" '.($image != NULL ? 'style="background-image:url('.asset($image->folder.$image->filename).')"' : '').'>
                                         <div class="container h-100 position-relative">
                                         <div class="row h-100 justify-content-center align-items-center">
-                                            <div class="col-md-6 text-center px-5 py-5" style="background-color: rgba(255, 255, 255, 0.7)">
+                                            <div class="text-container col-md-6 text-center px-5 py-5" style="background-color: rgba(255, 255, 255, 0.7)">
                                                 '.($text).'
                                             </div>
                                         </div>

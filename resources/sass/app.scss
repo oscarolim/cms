@@ -57,3 +57,25 @@ body
     background-position: center;
     background-repeat: no-repeat;
 }
+
+.full-width-image-container .text-container,
+.full-75pc-width-image-container .text-container
+{
+    display: none;
+}
+
+.text-image-left-container .image-container,
+.text-image-right-container .image-container
+{
+    overflow: hidden;;
+}
+
+.text-image-left-container img
+{
+    margin-left: -100%;
+}
+
+.text-image-right-container img
+{
+    margin-left: 100%;
+}

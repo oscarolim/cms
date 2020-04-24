@@ -1,5 +1,6 @@
 require('./bootstrap');
 require('./content-block');
+require('./jquery.easing.1.3');
 
 $(document).ready(function(){
     $('.toast').toast('show').on('hidden.bs.toast', function (){
@@ -34,6 +35,15 @@ $(document).ready(function(){
         ($(this).closest('form').find('input[name="_method"]')).attr('value', 'PUT');
         $(this).closest('form').attr('action', $(this).data('action')).submit();
     });
+
+    //Animations
+    $('.full-width-image-container .text-container, .full-75pc-width-image-container .text-container').fadeIn(300, 'easeIn');
+    $('.full-width-image-container .text-container, .full-75pc-width-image-container .text-container').children().each(function(index){
+        $(this).hide(0).delay(500 * (index + 1)).fadeIn(300, 'easeIn');     
+    });
+
+    $('.text-image-left-container img').css({'opacity': 0}).animate({'margin-left' : '0%', 'opacity': 1}, 350, 'easeIn')
+    $('.text-image-right-container img').css({'opacity': 0}).animate({'margin-left' : '0%', 'opacity': 1}, 350, 'easeIn')
 });
 
 window.show_toast = function(title, message = '', type = ''){
